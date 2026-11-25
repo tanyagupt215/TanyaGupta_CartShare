@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CartShare | Collaborative Group Cart</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+    <!-- ==================== 1. LOGIN / ROOM JOIN SECTION ==================== -->
+    <div id="login-screen" class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow-lg border-0 p-4 login-card">
+            <div class="text-center mb-4">
+                <div class="brand-badge mx-auto mb-2">
+                    <i class="bi bi-cart4 fs-2 text-white"></i>
+                </div>
+                <h2 class="fw-bold text-dark">CartShare</h2>
+                <p class="text-muted small">Shop together, hit free delivery, split effortlessly.</p>
+            </div>
+
+            <form id="join-room-form">
+                <div class="mb-3">
+                    <label for="username" class="form-label fw-semibold">Your Name</label>
+                    <input type="text" class="form-control" id="username" placeholder="e.g., Alex" required>
+                </div>
+                <div class="mb-3">
+                    <label for="room-code" class="form-label fw-semibold">Room Code</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control text-uppercase" id="room-code" placeholder="e.g., DORM42" required>
+                        <button class="btn btn-outline-secondary" type="button" id="generate-code-btn" title="Generate Random Code">
+                            <i class="bi bi-shuffle"></i>
+                        </button>
+                    </div>
+                    <div class="form-text">Share this code with friends in another tab to sync!</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                    Enter Shared Room <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== 2. MAIN COLLABORATIVE DASHBOARD ==================== -->
+    <div id="app-screen" class="d-none">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm no-print">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="#"><i class="bi bi-cart4 me-2"></i>CartShare</a>
+                <div class="d-flex align-items-center gap-3 text-white">
+                    <span class="badge bg-light text-primary fs-6" id="display-room-code">ROOM: ---</span>
+                    <span class="small d-none d-sm-inline"><i class="bi bi-person-circle me-1"></i><span id="display-username">User</span></span>
+                    <button class="btn btn-sm btn-outline-light" id="leave-room-btn">Leave</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container my-4 no-print">
+            <!-- Free Shipping Threshold Bar -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-dark" id="shipping-status-text">Add $75.00 more to unlock FREE shipping!</span>
+                        <span class="fw-bold text-primary" id="cart-total-badge">$0.00 / $75.00</span>
+                    </div>
+                    <div class="progress" style="height: 14px;">
+                        <div id="shipping-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSS Grid / Bootstrap Responsive Layout -->
+            <div class="row g-4">
+                <!-- Left Column: Add Item & Shared Cart -->
+                <div class="col-lg-8">
+                    <!-- Add Item Form -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white fw-bold py-3">
+                            <i class="bi bi-plus-circle text-primary me-2"></i>Add Item to Shared Cart
+                        </div>
+                        <div class="card-body">
+                            <form id="add-item-form" class="row g-2">
+                                <div class="col-md-5">
+                                    <input type="text" id="item-name" class="form-control" placeholder="Item name (e.g., Oat Milk)" required>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" id="item-price" class="form-control" placeholder="Price" step="0.01" min="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <input type="number" id="item-qty" class="form-control" value="1" min="1" max="99" required>
+                                </div>
+                                <div class="col-md-2 d-grid">
+                                    <button type="submit" class="btn btn-primary fw-semibold">Add</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Shared Cart List -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-bold"><i class="bi bi-bag-check text-primary me-2"></i>Shared Cart Items</span>
+                            <button class="btn btn-sm btn-success" id="print-receipt-btn">
+                                <i class="bi bi-printer me-1"></i>Print Audit Receipt
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Added By</th>
+                                            <th>Qty</th>
+                                            <th>Price</th>
+                                            <th>Subtotal</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cart-table-body">
+                                        <!-- Dynamic items injected via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="empty-cart-msg" class="text-center py-5 text-muted">
+                                <i class="bi bi-cart-x fs-1 d-block mb-2"></i>
+                                Your room's cart is empty. Add an item above!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Individual Split Summary & Real-Time Activity Log -->
+                <div class="col-lg-4">
+                    <!-- Expense Split Breakdown -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white fw-bold py-3">
+                            <i class="bi bi-pie-chart text-primary me-2"></i>Member Split Breakdown
+                        </div>
+                        <ul class="list-group list-group-flush" id="member-split-list">
+                            <!-- Dynamic user totals injected via JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Real-Time Activity Log -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-bold"><i class="bi bi-activity text-danger me-2"></i>Live Room Activity</span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Synced</span>
+                        </div>
+                        <div class="card-body activity-feed" id="activity-log-list">
+                            <!-- Dynamic activity logs injected via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ==================== 3. AUDIT-READY PRINTABLE RECEIPT ==================== -->
+        <section id="printable-receipt" class="print-only p-4">
+            <div class="receipt-box mx-auto">
+                <div class="text-center border-bottom pb-3 mb-3">
+                    <h3 class="fw-bold mb-1">CARTSHARE AUDIT RECEIPT</h3>
+                    <p class="mb-0 text-muted" id="receipt-room-info">Room: --- | Date: ---</p>
+                </div>
+
+                <h6 class="fw-bold text-uppercase">1. Itemized Group Order</h6>
+                <table class="table table-sm table-bordered mb-4">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Added By</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receipt-items-body"></tbody>
+                </table>
+
+                <h6 class="fw-bold text-uppercase">2. Individual Cost Split (Who Owes What)</h6>
+                <table class="table table-sm table-bordered mb-4">
+                    <thead>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Items Count</th>
+                            <th>Amount Owed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receipt-split-body"></tbody>
+                </table>
+
+                <div class="border-top pt-3 d-flex justify-content-between fw-bold fs-5">
+                    <span>GRAND TOTAL:</span>
+                    <span id="receipt-grand-total">$0.00</span>
+                </div>
+                <p class="text-center text-muted small mt-4">Generated via CartShare Collaborative Ecosystem</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+/* General Layout & Flexbox Helpers */
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 16px;
+}
+
+.brand-badge {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Live Activity Feed Scrolling */
+.activity-feed {
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.activity-item {
+    font-size: 0.875rem;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-left: 3px solid #0d6efd;
+    border-radius: 4px;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #6c757d;
+    display: block;
+}
+
+/* Hide Printable Receipt on Normal Screen */
+.print-only {
+    display: none;
+}
+
+/* ==================== PRINT MEDIA RULES ==================== */
+@media print {
+    body {
+        background-color: #fff !important;
+        color: #000 !important;
+    }
+
+    /* Hide interactive web interface */
+    .no-print {
+        display: none !important;
+    }
+
+    /* Show and format the audit receipt */
+    .print-only {
+        display: block !important;
+        width: 100%;
+    }
+
+    .receipt-box {
+        max-width: 100%;
+        font-family: 'Courier New', Courier, monospace;
+    }
+}
